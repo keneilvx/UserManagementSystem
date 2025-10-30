@@ -46,6 +46,49 @@ It uses Microsoft's `Microsoft.Extensions.Logging` - `ILogger<T>`  and extends i
 
 ## Data contracts
 
-``
+`POST` - `api/auth/register`
+```
+{
+  "username": "string",
+  "firstName": "string",
+  "lastName": "string",
+  "email": "string",
+  "password": "string",
+  "createdAt": "2025-10-30T22:51:38.546Z",
+  "lastLoginAt": "2025-10-30T22:51:38.546Z"
+}
+```
 
+`POST`- `api/auth/login`
+
+```
+{
+  "email": "string",
+  "password": "string"
+}
+```
+
+
+`POST` - `api/webhook/user-logged-in`
+
+
+```
+{
+  "event": "string",
+  "timestamp": "2025-10-30T22:48:02.521Z",
+  "activeUsers": [
+    {
+      "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "username": "string",
+      "firstName": "string",
+      "lastName": "string",
+      "email": "string",
+      "createdAt": "2025-10-30T22:48:02.521Z",
+      "lastLoginAt": "2025-10-30T22:48:02.521Z"
+    }
+  ]
+}
+```
+
+`GET` - `users`
 
