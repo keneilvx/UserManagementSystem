@@ -54,13 +54,6 @@ using var scope = app.Services.CreateScope();
 var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 UserData.UserSeed(db);
 
-
-
-// Configure JWT Authentication
-
-
-
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using UserManagementSystem.Domain.DTOs.User;
-using UserManagementSystem.Infrastructure.Context;
-using UserManagementSystem.Domain.Mappings.Users;
 using UserManagementSystem.Application.Services.AuthService;
-using Microsoft.AspNetCore.Authorization;
 using UserManagementSystem.Application.Services.UserService;
+using UserManagementSystem.Domain.DTOs.User;
+using UserManagementSystem.Domain.Mappings.Users;
+using UserManagementSystem.Infrastructure.Context;
+using UserManagementSystem.Infrastructure.Logging;
 
 namespace UserManagementSystem.API.Controllers
 {
@@ -15,14 +16,15 @@ namespace UserManagementSystem.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly AppDbContext _context;
-        private readonly IAuthService _authService;
-        private readonly IUserService _userService;
 
-        public UserController(AppDbContext context, IAuthService authService, IUserService userService)
+        private readonly IUserService _userService;
+        private readonly GenericLogger<UserController> _logger;
+
+        public UserController(AppDbContext context, IUserService userService, GenericLogger<UserController> logger)
         {
             _context = context;
-            _authService = authService;
             _userService = userService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -37,12 +39,12 @@ namespace UserManagementSystem.API.Controllers
 
         [Authorize]
         [HttpGet("{id}")]
-        public  async Task<IActionResult> AuthenicateUser([FromBody] LoginRequestDTO login) 
+        public  async Task<IActionResult> GetUser(Guid id) 
         {
-            var response = await _authService.LoginAsync(login);
+            var response = await _userService.GetUser(id);
             if (response == null)
             {
-                return Unauthorized("Invalid Email or Password.");
+                return Unauthorized("User not found");
             }
 
             return Ok(response);
@@ -56,7 +58,10 @@ namespace UserManagementSystem.API.Controllers
             var updatedUser = await _userService.UpdateUser(updateUser);
 
             if (updatedUser == null)
+            {
                 return NotFound(new { message = "User not found" });
+            }
+               
 
             return Ok(updatedUser);
         }
@@ -68,8 +73,10 @@ namespace UserManagementSystem.API.Controllers
             var deleted = await _userService.DeleteUser(id);
 
             if (!deleted)
+            {
                 return NotFound(new { message = "User not found" });
-
+            }
+               
             return NoContent(); 
         }
     }
