@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UserManagementSystem.Domain.DTOs.User;
 using UserManagementSystem.Infrastructure.Context;
+using UserManagementSystem.Domain.Mappings.Users;
 
 namespace UserManagementSystem.Application.Services.UserService
 {
@@ -21,7 +22,14 @@ namespace UserManagementSystem.Application.Services.UserService
             _configuration = configuration;
         }
 
+        public async Task<IEnumerable<ReadUserDTO>> GetAllUsers()
+        {
+            var users = await _context.Users.ToListAsync();
 
+            var result = users.Select(x => x.ToReadDTO());
+
+            return result;
+        }
         public async Task<ReadUserDTO?> GetUser(Guid id)
         {
                 var user = await _context.Users
