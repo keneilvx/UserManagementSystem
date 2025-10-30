@@ -16,6 +16,10 @@ namespace UserManagementSystem.Infrastructure.Logging
             _logger = logger;     
         }
 
+        public GenericLogger()
+        {
+        }
+
         public void LogInformation(string message, params object[] args)
         {
             _logger.LogInformation(message, args);
