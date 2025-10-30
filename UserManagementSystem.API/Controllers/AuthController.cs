@@ -2,30 +2,33 @@
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using UserManagementSystem.Application.Services.AuthService;
 using UserManagementSystem.Application.Services.Webhooks;
+using UserManagementSystem.Domain.DTOs;
 using UserManagementSystem.Domain.DTOs.User;
 using UserManagementSystem.Domain.Mappings.Users;
 using UserManagementSystem.Infrastructure.Context;
 using UserManagementSystem.Infrastructure.Logging;
+using UserManagementSystem.Infrastructure.Migrations;
 
 namespace UserManagementSystem.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        private readonly IAuthService _authService;
-        private readonly IWebHookService _webHookService;
-        private readonly string _webhookUrl = "https://localhost:7175/api/webhook/login";
+        private readonly IAuthService _authService;    
         private readonly GenericLogger<AuthController> _logger;
 
-        public AuthController(AppDbContext context, IAuthService authService, WebHookService webHookService, GenericLogger<AuthController> logger)
+        public AuthController( 
+            IAuthService authService,
+            GenericLogger<AuthController> logger
+            )
         {
-            _context = context;
             _authService = authService;
-            _webHookService = webHookService;
             _logger = logger;
         }
 
@@ -35,6 +38,7 @@ namespace UserManagementSystem.API.Controllers
             var user = await _authService.RegisterAsync(request);
             if (user == null)
             {
+                _logger.LogWarning("Failed create the user with {Request}", Request);
                 return BadRequest("Username already exists.");
             }
 
@@ -54,9 +58,7 @@ namespace UserManagementSystem.API.Controllers
             _logger.LogInformation("Login successful for {Email}", login.Email);
 
             return Ok(response);
-        }
+        }      
 
-
-       
     }
 }

@@ -11,12 +11,11 @@ using UserManagementSystem.Infrastructure.Logging;
 
 namespace UserManagementSystem.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [ApiController]
     public class UserController : ControllerBase
     {
         private readonly AppDbContext _context;
-
         private readonly IUserService _userService;
         private readonly GenericLogger<UserController> _logger;
 
@@ -30,11 +29,9 @@ namespace UserManagementSystem.API.Controllers
         [HttpGet("/users")]
         public async Task<ActionResult<IEnumerable<ReadUserDTO>>> GetUsers()
         {
-            var users = await _context.Users.ToListAsync();
+            var users = await _userService.GetAllUsers();
 
-            var result = users.Select(x => x.ToReadDTO());
-
-            return Ok(result);
+            return Ok(users);
         }
 
         [Authorize]
@@ -44,6 +41,7 @@ namespace UserManagementSystem.API.Controllers
             var response = await _userService.GetUser(id);
             if (response == null)
             {
+                _logger.LogWarning("User with id {UserId} not found", id);
                 return Unauthorized("User not found");
             }
 
@@ -59,10 +57,10 @@ namespace UserManagementSystem.API.Controllers
 
             if (updatedUser == null)
             {
+                _logger.LogWarning("Failed to update {UserId}", id);
                 return NotFound(new { message = "User not found" });
             }
                
-
             return Ok(updatedUser);
         }
 
@@ -74,6 +72,7 @@ namespace UserManagementSystem.API.Controllers
 
             if (!deleted)
             {
+                _logger.LogWarning("Failed to delete user with id {UserId}", id);
                 return NotFound(new { message = "User not found" });
             }
                
