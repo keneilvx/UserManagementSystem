@@ -27,7 +27,7 @@ namespace UserManagementSystem.API.Controllers
             _logger = logger;
         }
 
-        [HttpGet]
+        [HttpGet("/users")]
         public async Task<ActionResult<IEnumerable<ReadUserDTO>>> GetUsers()
         {
             var users = await _context.Users.ToListAsync();

@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using UserManagementSystem.Application.Services.AuthService;
 using UserManagementSystem.Application.Services.Webhooks;
 using UserManagementSystem.Infrastructure.Logging;
+using UserManagementSystem.Application.Services.UserService;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,7 +22,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseInMemoryDatabase("UserManagemnentDb"));
 
-builder.Services.AddTransient<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddHttpClient<IWebHookService, WebHookService>();
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
